@@ -1,0 +1,14 @@
+{% load i18n %}
+<div class="plugin_twitter">
+    {% if object.title %}<h2>{{ object.title }}</h2>{% endif %}
+    <a class="twitter-timeline"
+        {% if object.tweet_limit %} data-tweet-limit="{{ object.tweet_limit }}" {% endif %}
+        {% if object.width %} data-width="{{ object.width }}" {% endif %}
+        {% if object.height %} data-height="{{ object.height }}" {% endif %}
+        {% if object.theme %} data-theme="{{ object.theme }}" {% endif %}
+        {% if object.link_color %} data-link-color="{{ object.link_color }}" {% endif %}
+        {% if object.chrome %} data-chrome="{{ object.get_chrome }}" {% endif %}
+        data-show-replies="{{ object.get_show_replies }}"
+        href="{{ object.twitter_url|safe }}">Tweets by {{ object.get_url_text }}</a>
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+</div>
