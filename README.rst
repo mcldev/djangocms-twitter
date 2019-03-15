@@ -13,18 +13,38 @@ django CMS Twitter plugin
 ``djangocms-twitter`` is a upgrade-friendly plugin, mostly derived from original
 implementation in **django CMS** core.
 
-Due to the switch from v 1.0 to v 1.1 in the twitter API, the original plugin no
-longer works, and it's going to be removed.
+**Substantive Changes**
+-----------------------
 
-Other plugin exists (or you could just switch to plain twitter widgets), althogh,
-it's still a bit frustrating to throw away existing plugins.
+The method of embedding tweets has now been changed to use the new Twitter publication method.
+See: https://publish.twitter.com
 
-Contrary to the 1.0 API, Twitter 1.1 API requires you to create client side
-plugins in your profile and ``djangocms-twitter`` can do very little to avoid
-this. It delivers data-compatible plugins for straightforward upgrade.
+See this URL for details: https://twittercommunity.com/t/deprecating-widget-settings/102295
 
-Some field has been deprecated as no longer used by the twitter widgets. They
-have been left for easier upgrade.
+ "In June 2016 we announced that we would be making it much easier for developers to create embedded timelines on their sites, by no longer requiring the timelines to be registered under widget settings 2.9k. We launched publish.twitter.com 14.7k to make it much easier to create timeline widgets without requiring you to make changes to your account settings, and to make the embedded timelines more flexible."
+
+Also the **Embedded Search has been removed**
+
+ "Embedded Search timelines have been deprecated"
+
+The following changes have been made to the plugin:
+###################################################
+#. Renamed Twitter Recent Entries to Twitter Timeline
+#. Removed Twitter Search
+#. Added migrations to remove deprecated fields:
+    - link_hint
+    - twitter_id
+#. Added fields to simplify user customisations:
+    - tweet_limit
+    - width
+    - height
+    - theme
+    - link_color
+    - chrome
+    - show_replies
+#. Replaced the userid with the flexible Twitter URL
+    - twitter_url
+
 
 Installation
 ------------
@@ -32,23 +52,29 @@ Installation
 First-time installation
 #######################
 
+#. Install from pypi::
+
+    $ pip install djangocms-twitter
+
 #. Add ``djangocms_twitter`` to ``INSTALLED_APPS``
 #. Apply migrations::
 
     $ python manage.py migrate djangocms_twitter
 
-#. Insert the plugins in the page and configure them as stated in Usage_.
+#. Insert the plugin into the page and configure as stated in Usage_.
 
-Upgrade from the in-core plugin
-###############################
+Upgrade from the existing plugin
+################################
 
-#. Remove ``cms.plugins.twitter`` from ``INSTALLED_APPS``
-#. Add ``djangocms_twitter`` to ``INSTALLED_APPS``
 #. Apply migrations::
 
     $ python manage.py migrate djangocms_twitter
 
-#. Modify the plugins instances according to Usage_.
+#. Remove orphaned plugins carefully! i.e. Twitter Search::
+
+    $ python manage.py cms delete-orphaned-plugins
+
+#. Modify the plugin instances according to Usage_.
 #. Check your Templates_.
 
 .. _Usage:
@@ -56,88 +82,37 @@ Upgrade from the in-core plugin
 Usage
 -----
 
-TwitterRecentEntriesPlugin
+TwitterTimelinePlugin
 ##########################
 
-For this plugin it's not necessary to create a widget for every plugin in your
-website; you could just consider the widget you create on the Twitter website
-as *templates* for this django CMS plugin:
+#. Enter the optional Title, this will be displayed above embedded tweets.
+#. Enter a Twitter URL, see the guidance at https://publish.twitter.com For example:
+    - A collection: https://twitter.com/TwitterDev/timelines/539487832448843776
+    - A tweet: https://twitter.com/Interior/status/463440424141459456
+    - A profile: https://twitter.com/TwitterDev
+    - A list: https://twitter.com/TwitterDev/lists/national-parks
+    - A moment: https://twitter.com/i/moments/625792726546558977
+    - A likes timeline: https://twitter.com/TwitterDev/likes
 
-##############################
-Create the twitter-side widget
-##############################
-
-#. Login in your twitter account;
-#. Go to https://twitter.com/settings/widgets;
-#. Create new widget;
-#. Select "**user timeline**" as source;
-#. Configure the options (theme, colours etc) as described in https://dev.twitter.com/docs/embedded-timelines;
-#. Create widget;
-#. get the value of ``data-widget-id`` in the embed code;
-
-#####################
-Plugin instances data
-#####################
-
-``data-widget-id`` value can be shared by any number of plugins instances, the
-plugin-provided user timeline will be shown, while the twitter widget graphics
-appearance will be used.
-
-#. Add or edit the **Twitter** plugin in you placeholders;
-#. Fill in the Twitter widget it field using the ``data-widget-id`` value from
-   the previous step;
-#. Save the plugin;
-
-
-TwitterSearchPlugin
-###################
-
-The twitter widget used by this plugin is entirely configured on the twitter
-website.
-
-##############################
-Create the twitter-side widget
-##############################
-
-#. Login in your twitter account;
-#. Go to https://twitter.com/settings/widgets;
-#. Create new widget;
-#. Select "**Search**" as source;
-#. Configure the search query;
-#. Configure the options (theme, colours etc) as described in https://dev.twitter.com/docs/embedded-timelines;
-#. Create widget;
-#. get the value of ``data-widget-id`` in the embed code;
-
-#####################
-Plugin instances data
-#####################
-
-#. Add or edit the **Twitter Search** plugin in you placeholders;
-#. Fill in the Twitter widget it field using the ``data-widget-id`` value from
-   the previous step;
-#. Optionally fill-in the query field in the plugin form; this is only used for
-   non-javascript enabled browser, as the ``data-widget-id`` will take over on
-   javascript-enabled ones;
-#. Save the plugin;
-
+#. Set the following values as required, see further guidance here: https://developer.twitter.com/en/docs/twitter-for-websites/timelines/overview.html:
+    - tweet_limit - number of tweets to display
+    - width - number in pixels (else 100% of parent)
+    - height - number in pixels (else 100% of parent)
+    - theme - light/dark
+    - link_color - use built-in colour selector
+    - chrome - set the borders
+    - show_replies - true/false
 
 .. _Templates:
 
 Templates
 ---------
 
-Older templates it's no longer valid. Most of the graphic configuration must be
-done in when creating the widget on the Twitter website.
-
 A limited set of client-side options exists to configure the widgets; see
-https://dev.twitter.com/docs/embedded-timelines#options for further info.
+https://developer.twitter.com/en/docs/twitter-for-websites/timelines/overview.html for further info.
 
-To apply them you need to modify the plugin templates:
+To apply them you need to apply the plugin settings above or modify the plugin templates:
 
-- ``cms/plugins/twitter_timeline.html``: for ``TwitterRecentEntriesPlugin``
-- ``cms/plugins/twitter_search_widget.html``: for ``TwitterSearchPlugin``
+- ``djangocms_twitter/twitter_timeline.html``: for ``TwitterTimelinePlugin``
 
-.. image:: https://d2weczhvl823v0.cloudfront.net/nephila/djangocms_twitter/trend.png
-   :alt: Bitdeli badge
-   :target: https://bitdeli.com/free
 

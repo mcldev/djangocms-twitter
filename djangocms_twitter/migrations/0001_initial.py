@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
                 ('twitter_user', models.CharField(max_length=75, verbose_name='twitter user')),
                 ('count', models.PositiveSmallIntegerField(default=3, help_text='Number of entries to display', verbose_name='count')),
                 ('link_hint', models.CharField(help_text='Deprecated: no longer used by Twitter widgets.', max_length=75, verbose_name='link hint', blank=True)),
-                ('twitter_id', models.CharField(help_text='See https://twitter.com/settings/widgets on how to obtain one', max_length=75, verbose_name='twitter id')),
+                ('twitter_id', models.CharField(help_text='See https://twitter.com/settings/widgets on how to obtain one', max_length=75, verbose_name='twitter id', blank=True, null=True)),
             ],
             options={
                 'abstract': False,
